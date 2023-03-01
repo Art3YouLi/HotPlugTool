@@ -1,4 +1,4 @@
-# Pikachu
+# Jack
 First tool for stress test.
 
 ## Logs
