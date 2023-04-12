@@ -14,8 +14,11 @@ from ttkbootstrap.scrolled import ScrolledText
 from ttkbootstrap.dialogs import Messagebox
 from .GUIFunction import ValidateInput, AutoControl
 
-base_win_weight = 800
-base_win_height = 550
+import win32api
+import win32con
+
+base_win_weight = int(win32api.GetSystemMetrics(win32con.SM_CXSCREEN) * 0.5)
+base_win_height = int(win32api.GetSystemMetrics(win32con.SM_CYSCREEN) * 0.5)
 
 
 def _async_raise(tid, exc_type):
@@ -44,7 +47,7 @@ class BaseWin:
         self.root = master
         self.root.title('HotSwap TestTool')
         self.root.geometry(str(base_win_weight) + 'x' + str(base_win_height))
-        self.root.resizable(width=False, height=False)
+        self.root.resizable(width=True, height=True)
         HomePage(self.root, log_config)
 
 
@@ -88,13 +91,13 @@ class HomePage:
 
     def page_frame(self):
         # 底层frame
-        self.frm0 = ttk.Frame(self.master, padding=5)
-        self.frm0.pack(fill=X, expand=YES, anchor=N)
+        self.frm0 = ttk.Frame(self.master)
+        self.frm0.pack(fill="both", expand=YES)
 
         # 基准界面frame1 - 使用说明
         info_frm = ttk.Labelframe(self.frm0, text='Info', bootstyle='INFO')
         info_frm.pack(fill=BOTH, expand=YES, pady=10)
-        textbox = ScrolledText(info_frm, padding=5, height=24, autohide=True, font='default 11 bold')
+        textbox = ScrolledText(info_frm, padding=5, autohide=True, font='default 11 bold')
         textbox.pack(fill=BOTH, expand=YES)
         textbox.insert(END, self.msg)
 
@@ -111,17 +114,17 @@ class HomePage:
         self.btn_only = ttk.Button(btn_frm, text='Only Control Relay', width=25, state='disabled',
                                    bootstyle='primary-outline',
                                    command=SwitchPage(self.master, 'nothing', self.frm0, self.log_config).switch_page)
-        self.btn_only.pack(side=LEFT, fill=X, expand=YES, pady=10, padx=5)
+        self.btn_only.pack(side=LEFT, fill=BOTH, expand=YES, padx=5)
 
         self.btn_win = ttk.Button(btn_frm, text='With Windows Application', width=25, state='disabled',
                                   bootstyle='success-outline',
                                   command=SwitchPage(self.master, 'windows', self.frm0, self.log_config).switch_page)
-        self.btn_win.pack(side=LEFT, fill=X, expand=YES, pady=10, padx=5)
+        self.btn_win.pack(side=LEFT, fill=BOTH, expand=YES, padx=5)
 
         self.btn_and = ttk.Button(btn_frm, text='With Android Application', width=25, state='disabled',
                                   bootstyle='warning-outline',
                                   command=SwitchPage(self.master, 'android', self.frm0, self.log_config).switch_page)
-        self.btn_and.pack(side=LEFT, fill=X, expand=YES, pady=10, padx=5)
+        self.btn_and.pack(side=LEFT, fill=BOTH, expand=YES, padx=5)
 
     # 根据确认复选框改变功能btn状态
     def switch_btn_status(self):
@@ -169,14 +172,13 @@ class ShotPage:
 
         # 底层frame
         self.frm0 = ttk.Frame(self.master, padding=5)
-        self.frm0.pack(fill=X, expand=YES, anchor=N)
+        self.frm0.pack(fill="both", expand=YES, anchor=N)
 
         # 参数部分
         # 继电器参数
         self.relay_frame()
         # app参数frame
         self.app_frame()
-
         # 控制按钮
         self.btn_frame()
 
@@ -257,7 +259,7 @@ class ShotPage:
             step_frm = ttk.Frame(shot_frame)
             step_frm.pack(fill=X, expand=YES, pady=5)
             step_lbl = ttk.Label(step_frm, text='App出图步骤', width=15)
-            step_lbl.pack(side=LEFT, padx=(10, 0))
+            step_lbl.pack(side=LEFT, fill=X, padx=(10, 0))
 
             canvas = ttk.Canvas(step_frm)
             canvas.pack(side=LEFT, fill=X, expand=YES, padx=5)
@@ -265,9 +267,9 @@ class ShotPage:
             self.tree_view = ttk.Treeview(canvas, show='headings', height=8)
             self.tree_view.configure(columns=tuple(self.win_columns))
             for col in self.win_columns:
-                self.tree_view.column(col, stretch=False, width=180)
+                self.tree_view.column(col)
             for col in self.tree_view['columns']:
-                self.tree_view.heading(col, text=col.title(), anchor=W)
+                self.tree_view.heading(col, text=col.title())
             self.tree_view.pack(side=LEFT, fill=X, expand=YES, padx=5)
 
             vbar = ttk.Scrollbar(canvas, orient=VERTICAL, command=self.tree_view.yview)
@@ -276,7 +278,7 @@ class ShotPage:
             vbar.grid(row=0, column=1, sticky=NS)
 
             btn_frm = ttk.Frame(step_frm)
-            btn_frm.pack(side=LEFT, fill=Y, expand=YES)
+            btn_frm.pack(side=RIGHT, fill=Y)
             btn_add = ttk.Button(btn_frm, text='Add', width=8, bootstyle='success', command=self.add_steps)
             btn_add.pack(expand=YES, padx=5)
             btn_del = ttk.Button(btn_frm, text='Del', width=8, bootstyle='DANGER', command=self.delete_steps)
@@ -423,7 +425,7 @@ class LogPage:
 
         # 底层frame
         self.frm0 = ttk.Frame(self.master, padding=5)
-        self.frm0.pack(fill=X, expand=YES, anchor=N)
+        self.frm0.pack(fill="both", expand=YES, anchor=N)
 
         # 继电器控制软件参数部分
         self.log_frame()
